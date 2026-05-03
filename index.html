@@ -1444,6 +1444,31 @@
             saveData();
             if (currentTab === 'tab-home') renderAll();
         }, 60000);
+        // ============ EMERGENCY FIX: ПРЯМЫЕ ОБРАБОТЧИКИ КЛИКОВ ============
+document.addEventListener('click', function(e) {
+    var target = e.target;
+    // Ищем ближайшую карточку привычки
+    while (target && target !== document.body) {
+        if (target.classList && target.classList.contains('habit-card')) {
+            var habitId = target.id.replace('habit-', '');
+            if (habitId === 'cardio') {
+                if (['Среда','Суббота'].includes(getRussianDay())) showCardioModal();
+            } else if (habitId === 'reading') {
+                var pages = prompt('Сколько страниц прочитано сегодня?', appData.readingPages[getTodayKey()] || 0);
+                if (pages !== null) { appData.readingPages[getTodayKey()] = parseInt(pages) || 0; saveData(); updateReadingHabit(); }
+            } else if (habitId === 'water') {
+                // ничего
+            } else if (habitId === 'noreels') {
+                if (appData.skippedReels[getTodayKey()]) delete appData.skippedReels[getTodayKey()];
+                toggleHabit(habitId);
+            } else if (habitId) {
+                toggleHabit(habitId);
+            }
+            return;
+        }
+        target = target.parentElement;
+    }
+});
     </script>
 </body>
 </html>
